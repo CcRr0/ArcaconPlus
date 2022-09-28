@@ -1,0 +1,14 @@
+.ArcaconSearcher_w {
+    font-family: Nanum Gothic;
+    margin-right: 0;
+    border: 0 solid;
+    border-radius: 2px;
+    opacity: 0;
+    height: 30px;
+    width: 0;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    z-index: 100;
+    transition: 0.3s;
+}

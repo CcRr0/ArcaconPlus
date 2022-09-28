@@ -1,0 +1,50 @@
+.container {
+    width: 300px;
+}
+
+.container legend {
+    font-size: 14px;
+}
+
+.loadArcacon {
+    width: 150px;
+    height: 30px;
+}
+
+.loadDelayCt {
+    display: none;
+}
+
+.loadDelay {
+    width: 40px;
+    text-align: center;
+    outline: 0;
+    border-width: 0 0 3px;
+    transition: width .2s, border-color .2s;
+}
+
+.loadDelay:focus {
+    width: 50px;
+    border-color: blue;
+}
+
+.loadProgress {
+    height: 35px;
+    width: 100%;
+    position: relative;
+    text-align: center;
+    accent-color: grey
+}
+
+.loadProgress:before {
+    content: attr(data-label);
+    position: absolute;
+    margin: 0;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

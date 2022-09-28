@@ -1,0 +1,58 @@
+{
+    "manifest_version": 3,
+    "name": "Arcacon+",
+    "description": "아카콘 검색기",
+    "version": "1.0",
+    "permissions": [
+        "storage",
+        "tabs",
+        "nativeMessaging"
+    ],
+    "action": {
+        "default_icon": "/assets/icon.png",
+        "default_popup": "/popup/popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://arca.live/*"
+            ],
+            "js": [
+                "/scripts/jquery-3.6.1.min.js",
+                "/scripts/arrive.min.js",
+                "/scripts/Map.js",
+                "/scripts/delay.js",
+                "/contentScripts/background.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://arca.live/b/*/*"
+            ],
+            "exclude_matches": [
+                "https://arca.live/b/*/write*",
+                "https://arca.live/b/*/edit*"
+            ],
+            "js": [
+                "/scripts/displayArcacon.js",
+                "/contentScripts/onComment.js"
+            ],
+            "css": [
+                "/contentScripts/onComment.css"
+            ]
+        },
+        {
+            "matches": [
+                "https://arca.live/b/*/write*",
+                "https://arca.live/b/*/edit*"
+            ],
+            "js": [
+                "/scripts/displayArcacon.js",
+                "/contentScripts/onWrite.js"
+            ],
+            "css": [
+                "/contentScripts/onWrite.css"
+            ]
+        }
+    ]
+}
