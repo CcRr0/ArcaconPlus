@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Arcacon+",
-    "description": "아카콘 검색기",
+    "description": "아카콘+",
     "version": "1.0",
     "permissions": [
         "storage",
