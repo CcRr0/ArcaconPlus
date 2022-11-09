@@ -1,14 +1,9 @@
 $(document).ready(async () => {
-    console.log("[Arcacon+] onWrite.js Loaded.");
+    console.log("[Arcacon+] [onWrite.js] Loaded.");
 
     const aS = "ArcaconSearcher_w";
 
-    var arcaconInfo = await new Promise(resolve =>
-        chrome.storage.sync.get("arcaconInfo", data => resolve((() => {
-            if(data.arcaconInfo) return JSON.parse(data.arcaconInfo, MapReviver);
-            else return new Map();
-        })()))
-    );
+    var arcaconInfo = await getArcaconInfo();
 
     var searcherActive = false;
     var observer = new MutationObserver(mutations => {
@@ -28,14 +23,12 @@ $(document).ready(async () => {
         cThumbnails.find("img").each(function() {
             $(this).attr("title", arcaconInfo.get($(this).attr("data-id")));
         });
+        cThumbnails.append($storeSearcher());
     });
 
 
     $(document).arrive("#arcacon-1", function() {
-        var input = document.createElement("input");
-        input.className = aS;
-        input.placeholder = "아카콘 검색하기";
-        $(this).before($(input));
+        $(this).before($arcaconSearcher(aS));
     });
 
     $(document).arrive(".namlacon", function() {
@@ -51,7 +44,7 @@ $(document).ready(async () => {
         $(".namlacon").parent().addClass("fr-active");
     });
 
-    $(document).on("change keyup paste", `.${aS}`, function() {
+    $(document).on("input", `.${aS}`, function() {
         var query = $(this).val();
         var cThumbnails = $(".thumbnails");
         displayArcacon(query, cThumbnails, arcaconInfo);
@@ -62,17 +55,23 @@ $(document).ready(async () => {
     const width = "200px";
     const margin = "10px";
     function activateSearcher(target) {
-        target.prop("active", true);
-        target.css("opacity", "1");
-        target.css("width", width);
-        target.css("border-width", "2px");
-        target.css({ transform: `translate(calc((${width} + ${margin}) * -1), -50%)` });
+        target
+            .css({
+                "opacity": "1",
+                "width": width,
+                "border-width": "2px",
+                "transform": `translate(calc((${width} + ${margin}) * -1), -50%)`
+            });
     }
     function deactivateSearcher(target) {
-        target.prop("active", false);
-        target.css("opacity", "0");
-        target.css("width", "0");
-        target.css("border-width", "0");
-        target.css({ transform: "translate(0, -50%)" });
+        target
+            .val("")
+            .css({
+                "opacity": "0",
+                "width": "0",
+                "border-width": "0",
+                "transform": "translate(0, -50%)"
+            });
+        displayArcacon("", $(".thumbnails"));
     }
 });

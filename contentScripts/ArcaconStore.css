@@ -1,0 +1,28 @@
+.thumbnails {
+    position: relative;
+}
+
+.ArcaconStore {
+    display: none;
+    position: absolute;
+    justify-content: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ArcaconStore_i {
+    font-family: Nanum Gothic;
+    width: 250px;
+    height: 28.5px;
+    border: 2px solid;
+    border-radius: 2px;
+}
+
+.ArcaconStore_b {
+    font-family: Nanum Gothic;
+    width: 85px;
+    height: 28.5px;
+    border: 2px solid;
+    border-radius: 2px;
+}
