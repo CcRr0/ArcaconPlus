@@ -1,14 +1,9 @@
 $(document).ready(async () => {
-    console.log("[Arcacon+] onComment.js Loaded.");
+    console.log("[Arcacon+] [onComment.js] Loaded.");
 
     const aS = "ArcaconSearcher_c";
 
-    var arcaconInfo = await new Promise(resolve =>
-        chrome.storage.sync.get("arcaconInfo", data => resolve((() => {
-            if(data.arcaconInfo) return JSON.parse(data.arcaconInfo, MapReviver);
-            else return new Map();
-        })()))
-    );
+    var arcaconInfo = await getArcaconInfo();
 
     var observer = new MutationObserver(mutations => {
         var ArcaconSearcher = $(mutations[0].target).parent().find(`.${aS}`);
@@ -24,12 +19,14 @@ $(document).ready(async () => {
         cThumbnails.find("img").each(function() {
             $(this).attr("title", arcaconInfo.get($(this).attr("data-id")));
         });
+        cThumbnails.append($storeSearcher());
     });
 
 
     $(document).on("click", ".btn-namlacon", function(e) {
         if(e.target.className == aS) {
             $(this).parent().parent().parent().find(".namlacon").css("display", "block");
+            return;
         }
 
         var ArcaconSearcher = $(this).find(`.${aS}`);
@@ -37,12 +34,10 @@ $(document).ready(async () => {
             var conTainer = $(this).parent().parent().parent().find(".namlacon").get(0);
             observer.observe(conTainer, { attributes: true });
 
-            var input = document.createElement("input");
-            input.className = aS;
-            input.placeholder = "아카콘 검색하기";
-            $(this).prepend($(input))
+            var $aS = $arcaconSearcher(aS);
+            $(this).prepend($aS)
                 .ready(() => {
-                    activateSearcher($(input));
+                    activateSearcher($aS);
                 });
 
             var cThumbnails = $(this).parent().parent().parent().find(".thumbnails").get(0);
@@ -50,7 +45,7 @@ $(document).ready(async () => {
         }
     });
 
-    $(document).on("change keyup paste", `.${aS}`, function() {
+    $(document).on("input", `.${aS}`, function() {
         var query = $(this).val();
         var cThumbnails = $(this).parent().parent().parent().parent().find(".thumbnails");
         displayArcacon(query, cThumbnails, arcaconInfo);
@@ -60,17 +55,27 @@ $(document).ready(async () => {
 
     const width = "200px";
     function activateSearcher(target) {
-        target.prop("active", true);
-        target.css("opacity", "1");
-        target.css("width", width);
-        target.css("margin", "0 10px 0 5px");
-        target.css("border-width", "2px");
+        target
+            .prop("active", true)
+            .focus()
+            .css({
+                "opacity": "1",
+                "width": width,
+                "margin": "0 10px 0 5px",
+                "border-width": "2px"
+            });
     }
     function deactivateSearcher(target) {
-        target.prop("active", false);
-        target.css("opacity", "0");
-        target.css("width", "0");
-        target.css("margin", "0");
-        target.css("border-width", "0");
+        target
+            .prop("active", false)
+            .blur()
+            .val("")
+            .css({
+                "opacity": "0",
+                "width": "0",
+                "margin": "0",
+                "border-width": "0"
+            });
+        displayArcacon("", $(target).parent().parent().parent().parent().find(".thumbnails"));
     }
 });

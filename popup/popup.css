@@ -1,14 +1,26 @@
-.container {
+.Container {
     width: 300px;
+    font-size: 12px;
 }
 
-.container legend {
+.Container legend {
     font-size: 14px;
 }
 
+.btCt {
+    position: relative;
+}
+
 .loadArcacon {
-    width: 150px;
+    width: 180px;
     height: 30px;
+    font-size: 13.5px;
+}
+
+.contact {
+    position: absolute;
+    right: 0;
+    bottom: 0;
 }
 
 .loadDelayCt {
@@ -24,8 +36,8 @@
 }
 
 .loadDelay:focus {
-    width: 50px;
-    border-color: blue;
+    width: 45px;
+    border-color: black;
 }
 
 .loadProgress {
@@ -33,7 +45,7 @@
     width: 100%;
     position: relative;
     text-align: center;
-    accent-color: grey
+    accent-color: grey;
 }
 
 .loadProgress:before {
