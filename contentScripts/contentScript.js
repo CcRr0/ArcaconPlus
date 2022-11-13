@@ -1,10 +1,11 @@
-console.log("[Arcacon+] [contentScript.js] Loaded.");
+var Log = pfLogger("[Arcacon+] [contentScript.js]");
+Log("Loaded.");
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if(request.req == "arcaconStatus") {
-        console.log("[Arcacon+] [contentScript.js] req: arcaconStatus");
+    Log(JSON.stringify(request));
 
+    if(request.req == "arcaconStatus") {
         (async () => {
             var arcaconInfo = await getArcaconInfo();
             var arcaconSaveDate = await getCStorage("arcaconSaveDate");
@@ -23,6 +24,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     }
                 });
                 cIDRemoved.forEach(e => arcaconInfo.delete(e));
+                if(cIDRemoved.length) setArcaconInfo(arcaconInfo); // Apply Removed
             });
 
             sendResponse({ arcaconInfo: JSON.stringify(arcaconInfo, MapReplacer), cIDUpdated, arcaconSaveDate });
@@ -30,8 +32,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     else if(request.req == "loadArcacon") {
-        console.log("[Arcacon+] [contentScript.js] req: loadArcacon");
-
         loadArcacon(request.cIDList, "newArcaconInfo", request.loadDelay * 1000);
     }
 
@@ -53,7 +53,7 @@ function loadArcacon(cIDList, req, loadDelay) {
                 }).fail(jqXHR => {
                     jqError = true;
                     var statusCode = jqXHR.status;
-                    console.log("[Arcacon+] [loadArcacon] Error: " + statusCode);
+                    Log("Error: " + statusCode);
                     sendCMessage({ req, status: false, statusCode });
                 });
             return sleep(loadDelay);

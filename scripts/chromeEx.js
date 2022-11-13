@@ -1,3 +1,9 @@
+// Logging with Prefix
+function pfLogger(pF) {
+    return log => console.log(`${pF} ${log}`);
+}
+
+
 // popup.js
 function validHost(host, callback) {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -6,16 +12,16 @@ function validHost(host, callback) {
     });
 }
 
+function getHostName(url) {
+    return (new URL(url)).hostname;
+}
+
 async function getActiveTabID() {
     return new Promise(resolve =>
         chrome.tabs.query({ active: true, currentWindow: true }, tabs =>
             resolve(tabs[0].id)
         )
     );
-}
-
-function getHostName(url) {
-    return (new URL(url)).hostname;
 }
 
 
@@ -40,7 +46,7 @@ async function getArcaconInfo() {
     else return new Map();
 }
 
-async function setArcaconInfo(arcaconInfo) { //Requires Moment.js
+async function setArcaconInfo(arcaconInfo) { // Requires moment.js
     return setCStorage({
         arcaconInfo: JSON.stringify(arcaconInfo, MapReplacer),
         arcaconSaveDate: moment().format("YYYY-MM-DD HH:mm:ss")
@@ -48,7 +54,7 @@ async function setArcaconInfo(arcaconInfo) { //Requires Moment.js
 }
 
 
-// MapJSON
+// Map Parse & Stringify
 function MapReplacer(key, value) {
     if(value instanceof Map) {
         return {
@@ -80,7 +86,7 @@ async function sendCMessage(request, tabID = undefined) {
 
 
 // Watching Tab Changes
-function findTabIDByHost(host) {
+async function findTabIDByHost(host) {
     return new Promise(resolve => {
         chrome.tabs.query({}, tabs => {
             tabs.forEach(tab => {
@@ -93,10 +99,22 @@ function findTabIDByHost(host) {
     });
 }
 
-function getActiveTabURL() {
+async function getActiveTabURL() {
     return new Promise(resolve =>
         chrome.tabs.query({ active: true, currentWindow: true }, tabs =>
             resolve(tabs[0].url)
         )
     );
+}
+
+
+// Badge
+function setBadgeText(text, color = undefined, tabId = undefined) {
+    if(color) chrome.action.setBadgeBackgroundColor({ color, tabId });
+    chrome.action.setBadgeText({ text: String(text), tabId });
+}
+
+async function setBadgeTextV(text, color = undefined) {
+    setBadgeText(text, color);
+    setBadgeText(text, color, await getActiveTabID());
 }

@@ -4,6 +4,15 @@ validHost("arca.live", () => {
             chrome.tabs.create({ url: $(this).attr("href") });
         });
 
+        (async () => {
+            var status = await sendCMessage({ req: "status" }, await getActiveTabID()); // To contentScript.js
+            if(status) {
+                if(status == "comment") statusText = "댓글"; else if(status == "write") statusText = "글";
+                $(".activeStatus").css({ "color": "green", "font-weight": "bold" })
+                    .text(`활성화됨(${statusText})`);
+            }
+        })();
+
 
         var arcaconStatus = await sendCMessage({ req: "arcaconStatus" }); // To background.js
         var totalCount = arcaconStatus.totalCount;
@@ -13,8 +22,7 @@ validHost("arca.live", () => {
 
         if(cIDUpdatedN) $(".cIDUpdated").html(`추가된 아카콘: ${cIDUpdatedN}개<br>`);
 
-        $(".loadDelayCt").css("display", "inline");
-        $(".loadDelay").val(loadDelay).attr("placeholder", loadDelay);;
+        $(".loadDelay").val(loadDelay).attr("placeholder", loadDelay);
 
 
         var displayProgress = (value = totalCount - cIDUpdatedN, max = totalCount, cTitle = "") => {
@@ -36,6 +44,8 @@ validHost("arca.live", () => {
                 $(".status").text("마지막 업데이트: 기록 없음");
 
             if(cIDUpdatedN) {
+                $(".loadDelayCt").css("display", "inline");
+
                 $(".loadArcacon").text(`아카콘 로드하기 (${etaString(cIDUpdatedN * loadDelay)})`);
                 $(".loadArcacon").on("click", function() {
                     loadDelay = Number($(".loadDelay").val());
@@ -62,6 +72,8 @@ validHost("arca.live", () => {
                 $(".loadArcacon").text("최신 상태입니다.");
             }
         } else { // Updating...
+            $(".loadDelayCt").css("display", "inline");
+
             $(".loadArcacon").text("업데이트 중...");
             $(".status").text("업데이트 중...");
             $(".loadDelay").prop("readonly", true);

@@ -34,9 +34,7 @@
                 "https://arca.live/b/*/*"
             ],
             "js": [
-                "/scripts/arcaconSearcher.js",
-                "/scripts/displayArcacon.js",
-                "/scripts/storeSearcher.js"
+                "/scripts/searcherModules.js"
             ],
             "css": [
                 "/contentScripts/ArcaconStore.css"
@@ -67,6 +65,17 @@
             ],
             "css": [
                 "/contentScripts/onWrite.css"
+            ]
+        },
+        {
+            "matches": [
+                "https://arca.live/e/*"
+            ],
+            "exclude_matches": [
+                "https://arca.live/e/"
+            ],
+            "js": [
+                "/contentScripts/storeListener.js"
             ]
         }
     ]

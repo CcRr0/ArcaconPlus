@@ -7,6 +7,10 @@
     font-size: 14px;
 }
 
+.activeStatus {
+    font-size: 13.5px;
+}
+
 .btCt {
     position: relative;
 }
