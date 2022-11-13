@@ -1,5 +1,13 @@
 $(document).ready(async () => {
-    console.log("[Arcacon+] [onWrite.js] Loaded.");
+    var log = pfLogger("[Arcacon+] [onWrite.js]");
+    log("Loaded.");
+    sendCMessage({ req: "status", status: "write" });
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if(request.req == "status") sendResponse("write");
+        return true;
+    });
+
 
     const aS = "ArcaconSearcher_w";
 
@@ -44,10 +52,12 @@ $(document).ready(async () => {
         $(".namlacon").parent().addClass("fr-active");
     });
 
-    $(document).on("input", `.${aS}`, function() {
-        var query = $(this).val();
-        var cThumbnails = $(".thumbnails");
-        displayArcacon(query, cThumbnails, arcaconInfo);
+    $(document).arrive(".thumbnails", function() {
+        var cThumbnails = $(this);
+        $(document).on("input", `.${aS}`, function() {
+            var query = $(this).val();
+            displayArcacon(query, cThumbnails, arcaconInfo);
+        });
     });
 
 

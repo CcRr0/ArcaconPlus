@@ -1,5 +1,13 @@
 $(document).ready(async () => {
-    console.log("[Arcacon+] [onComment.js] Loaded.");
+    var Log = pfLogger("[Arcacon+] [onComment.js]");
+    Log("Loaded.");
+    sendCMessage({ req: "status", status: "comment" });
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if(request.req == "status") sendResponse("comment");
+        return true;
+    });
+    
 
     const aS = "ArcaconSearcher_c";
 
@@ -45,10 +53,16 @@ $(document).ready(async () => {
         }
     });
 
-    $(document).on("input", `.${aS}`, function() {
-        var query = $(this).val();
+    $(document).on("focusin", `.${aS}`, function() {
         var cThumbnails = $(this).parent().parent().parent().parent().find(".thumbnails");
-        displayArcacon(query, cThumbnails, arcaconInfo);
+        $(this).on("input", function() {
+            var query = $(this).val();
+            displayArcacon(query, cThumbnails, arcaconInfo);
+        });
+    });
+
+    $(document).on("focusout", `.${aS}`, function() {
+        $(this).off("input");
     });
 
 
