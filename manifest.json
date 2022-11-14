@@ -6,12 +6,12 @@
     "permissions": [
         "storage",
         "unlimitedStorage",
+        "action",
         "tabs",
         "nativeMessaging"
     ],
     "action": {
-        "default_icon": "/assets/icon.png",
-        "default_popup": "/popup/popup.html"
+        "default_icon": "/assets/icon.png"
     },
     "background": {
         "service_worker": "/background/background.js"
