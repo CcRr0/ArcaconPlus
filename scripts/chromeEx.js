@@ -5,13 +5,6 @@ function pfLogger(pF) {
 
 
 // popup.js
-function validHost(host, callback) {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        if(getHostName(tabs[0].url) == host) callback();
-        else window.close();
-    });
-}
-
 function getHostName(url) {
     return (new URL(url)).hostname;
 }
@@ -110,11 +103,10 @@ async function getActiveTabURL() {
 
 // Badge
 function setBadgeText(text, color = undefined, tabId = undefined) {
-    if(color) chrome.action.setBadgeBackgroundColor({ color, tabId });
+    if(color) setBadgeColor(color, tabId);
     chrome.action.setBadgeText({ text: String(text), tabId });
 }
 
-async function setBadgeTextV(text, color = undefined) {
-    setBadgeText(text, color);
-    setBadgeText(text, color, await getActiveTabID());
+function setBadgeColor(color, tabId = undefined) {
+    chrome.action.setBadgeBackgroundColor({ color, tabId });
 }

@@ -3,20 +3,39 @@ var Log = pfLogger("[Arcacon+] [background.js]");
 
 
 
+var startupChecked = false;
 var arcaconUpdating = false;
 var arcaconStatus, currentTabID;
 var arcaconInfo, cIDList = new Array(), cIDUpdatedN, totalCount, arcaconSaveDate; // arcaconStatus
-const defaultLoadDelay = 0.5;
+const defaultLoadDelay = 0.4;
 var loadDelay, cFinished, errorCaught; // From popup.js, req: arcaconUpdateInit
 
 
-var displayCurrent = async (tabID = undefined) => {
-    setBadgeTextV(arcaconInfo.size, "green", tabID);
+var displayCurrent = () => {
+    setBadgeText(arcaconInfo.size, "green");
 };
 (async () => {
     arcaconInfo = await getArcaconInfo();
     displayCurrent();
 })();
+
+var loadArcaconStatus = async () => {
+    setBadgeText(" ... ", "blue");
+
+    arcaconStatus = await sendCMessage({ req: "arcaconStatus" }, currentTabID = await getActiveTabID()); // to contentScript.js
+    arcaconInfo = JSON.parse(arcaconStatus.arcaconInfo, MapReviver);
+    cIDList = arcaconStatus.cIDUpdated;
+    cIDUpdatedN = cIDList.length;
+    totalCount = arcaconInfo.size + cIDList.length;
+    arcaconSaveDate = arcaconStatus.arcaconSaveDate;
+
+    if(cIDUpdatedN) {
+        setBadgeText(`${cIDUpdatedN}!`, "blue");
+    } else {
+        displayCurrent();
+    }
+};
+
 
 
 var autoReconnector = (tabID, change, tab) => {
@@ -47,6 +66,13 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     Log(JSON.stringify(request));
 
+    if(request.req == "setPopup") {
+        chrome.action.setPopup({ popup: "/popup/popup.html", tabId: sender.tab.id });
+        if(!startupChecked) {
+            loadArcaconStatus().then(() => startupChecked = true);
+        }
+    }
+
     if(request.req == "arcaconUpdating") { // from popup.js
         sendResponse(arcaconUpdating);
     }
@@ -54,21 +80,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     else if(request.req == "arcaconStatus") { // from popup.js
         (async () => {
             if(!arcaconUpdating) {
-                setBadgeTextV(" ... ", "blue", currentTabID = await getActiveTabID());
-
-                arcaconStatus = await sendCMessage({ req: "arcaconStatus" }, currentTabID); // to contentScript.js
-                arcaconInfo = JSON.parse(arcaconStatus.arcaconInfo, MapReviver);
-                cIDList = arcaconStatus.cIDUpdated;
-                cIDUpdatedN = cIDList.length;
-                totalCount = arcaconInfo.size + cIDList.length;
-                arcaconSaveDate = arcaconStatus.arcaconSaveDate;
-
-                if(cIDUpdatedN) {
-                    setBadgeTextV(`${cIDUpdatedN}!`, "blue", currentTabID); // For onComment, onWrite
-                } else {
-                    displayCurrent(currentTabID);
-                    displayCurrent();
-                }
+                await loadArcaconStatus();
             }
 
             sendResponse({ totalCount, cIDUpdatedN, arcaconSaveDate, loadDelay: defaultLoadDelay });
@@ -104,7 +116,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     Log(`Error, statusCode: ${request.statusCode}`);
                     Log("arcaconInfo Updated.");
 
-                    setBadgeTextV(request.statusCode, "red", currentTabID);
+                    setBadgeText(request.statusCode, "red");
                     setTimeout(() => {
                         displayCurrent();
                     }, 1500);
@@ -133,14 +145,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }); // To popup.js
 
         var statusPt = Math.floor((arcaconInfo.size / totalCount) * 100);
-        setBadgeTextV(statusPt + "%", "blue", currentTabID);
+        setBadgeText(statusPt + "%", "blue");
 
         if(!cIDList.length) { // Update finished
             setArcaconInfo(arcaconInfo).then(() => {
                 arcaconUpdating = false;
                 Log("arcaconInfo Updated.");
 
-                setBadgeTextV("100%", "green", currentTabID);
+                setBadgeText("100%", "green");
                 setTimeout(() => {
                     displayCurrent();
                 }, 1500);
@@ -152,34 +164,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     else if(request.req == "addArcaconInfo") { // From storeListener.js
+        if(arcaconUpdating) return true;
         (async () => {
             arcaconInfo = await getArcaconInfo();
             arcaconInfo.set(request.cID, request.cTitle);
             await setArcaconInfo(arcaconInfo);
             Log(`arcaconInfo Updated. cID: ${request.cID}, cTitle: ${request.cTitle}`);
-            displayCurrent();
+            setBadgeText("100%", "green");
+            setTimeout(() => {
+                displayCurrent();
+            }, 1500);
         })();
     }
 
     else if(request.req == "removeArcaconInfo") { // From storeListener.js
+        if(arcaconUpdating) return true;
         (async () => {
             arcaconInfo = await getArcaconInfo();
             arcaconInfo.delete(request.cID);
             await setArcaconInfo(arcaconInfo);
             Log(`arcaconInfo Removed. cID: ${request.cID}, cTitle: ${request.cTitle}`);
-            displayCurrent();
+            setBadgeText("100%", "green");
+            setTimeout(() => {
+                displayCurrent();
+            }, 1500);
         })();
     }
 
     else if(request.req == "status") { // From onComment.js || onWrite.js
-        if(arcaconUpdating || cIDList.length) return true;
-
-        if(request.status == "comment")
-            text = " C ";
-        else if(request.status == "write")
-            text = " W ";
-
-        setBadgeText(text, "mediumspringgreen", sender.tab.id);
+        if(!startupChecked || arcaconUpdating || cIDList.length) return true;
+        setBadgeColor("mediumspringgreen", sender.tab.id);
     }
 
 
