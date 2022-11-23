@@ -1,14 +1,13 @@
 {
     "manifest_version": 3,
     "name": "Arcacon+",
-    "description": "아카콘+",
-    "version": "1.0",
+    "description": "아카라이브(arca.live) 아카콘 검색",
+    "version": "1.1",
     "permissions": [
         "storage",
         "unlimitedStorage",
         "action",
-        "tabs",
-        "nativeMessaging"
+        "tabs"
     ],
     "action": {
         "default_icon": "/assets/icon.png"
