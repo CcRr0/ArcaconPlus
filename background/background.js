@@ -37,7 +37,6 @@ var loadArcaconStatus = async () => {
 };
 
 
-
 var autoReconnector = (tabID, change, tab) => {
     if((tabID == currentTabID && (change.status == "complete" || "isWindowClosing" in change)) || // Current tab loaded or closed
         (!currentTabID && change.status == "complete")) { // New tab loaded
@@ -56,17 +55,11 @@ var autoReconnector = (tabID, change, tab) => {
 };
 
 
-chrome.tabs.onActivated.addListener(async activeInfo => {
-    if(!arcaconUpdating && getHostName(await getActiveTabURL()) != "arca.live") {
-        setBadgeText("", false, activeInfo.tabId);
-    }
-});
-
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     Log(JSON.stringify(request));
 
-    if(request.req == "setPopup") {
+    if(request.req == "contentScript") {
         chrome.action.setPopup({ popup: "/popup/popup.html", tabId: sender.tab.id });
         if(!startupChecked) {
             loadArcaconStatus().then(() => startupChecked = true);

@@ -1,6 +1,6 @@
 var Log = pfLogger("[Arcacon+] [contentScript.js]");
 Log("Loaded.");
-sendCMessage({ req: "setPopup" });
+sendCMessage({ req: "contentScript" });
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
